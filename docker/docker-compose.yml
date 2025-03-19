@@ -1,0 +1,21 @@
+services:
+  rvst-ss25:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: rvst-ss25
+      ssh:
+        - default
+    network_mode: "host"
+    volumes:
+      - ..:/rvst-ss25/src/test-node-ss25
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      - $HOME/vscode-server:$HOME/.vscode-server
+    environment:
+      - DISPLAY
+      - TERM
+      - QT_X11_NO_MITSHM=1
+    privileged: true
+    stdin_open: true
+    tty: true

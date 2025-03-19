@@ -1,0 +1,62 @@
+FROM osrf/ros:noetic-desktop-full AS rvst-ss25
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository -y ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install wget locales
+    #apt install -y python3.10 wget
+
+# Set the locale
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen
+ENV LANG=en_US.UTF-8  
+ENV LANGUAGE=en_US:en  
+ENV LC_ALL=en_US.UTF-8     
+
+
+RUN wget https://bootstrap.pypa.io/get-pip.py && \
+   python3 get-pip.py && \
+   rm get-pip.py
+
+RUN apt-get install -y \
+    git python3-catkin-tools python3-osrf-pycommon python3-tk tmux nano clang-tidy clang-format
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+
+RUN apt-get install -y \
+	ros-noetic-joy \
+    ros-noetic-teleop-twist-joy \
+    ros-noetic-teleop-twist-keyboard \
+    ros-noetic-ros-control \
+    ros-noetic-ros-controllers \
+    ros-noetic-smach-viewer
+
+RUN pip install open3d --ignore-installed PyYAML
+
+SHELL ["/bin/bash", "-c"]
+RUN source /opt/ros/noetic/setup.bash
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+RUN source ~/.bashrc
+
+
+RUN mkdir -p /rvst-ss25/src
+WORKDIR /rvst-ss25
+RUN catkin init
+
+WORKDIR /rvst-ss25
+RUN source ~/.bashrc
+RUN catkin config --extend /opt/ros/noetic
+RUN catkin build
+RUN rosdep update
+RUN source /rvst-ss25/devel/setup.bash
+#RUN catkin config --no-skiplist
+#RUN catkin build
+
+RUN source /rvst-ss25/devel/setup.bash
+RUN echo "source /rvst-ss25/devel/setup.bash" >> ~/.bashrc
+RUN source ~/.bashrc
