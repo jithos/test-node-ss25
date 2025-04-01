@@ -8,7 +8,7 @@ services:
         - default
     network_mode: "host"
     volumes:
-      - ..:/rvst-ss25/src/test-node-ss25
+      - ..:/rvst-ss25/src/test_node_ss25
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /etc/localtime:/etc/localtime:ro
       - $HOME/vscode-server:$HOME/.vscode-server
